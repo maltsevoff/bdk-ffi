@@ -41,11 +41,26 @@ lipo target/aarch64-apple-darwin/release-smaller/libbdkffi.a target/x86_64-apple
 cd ../bdk-swift/ || exit
 
 # move bdk-ffi static lib header files to temporary directory
-mkdir -p "${NEW_HEADER_DIR}"
-mv "${HEADERPATH}" "${NEW_HEADER_DIR}"
-mv "${MODMAPPATH}" "${NEW_HEADER_DIR}/module.modulemap"
-echo -e "\n" >> "${NEW_HEADER_DIR}/module.modulemap"
+# Final xcframework structure (per-arch):
+#   Headers/
+#     BDKFFI/
+#       BitcoinDevKitFFI.h
+#       module.modulemap
 
+# Start from a clean header include dir so we don't get duplicates
+rm -f "${NEW_HEADER_DIR}/BitcoinDevKitFFI.h" "${NEW_HEADER_DIR}/module.modulemap"
+rm -rf "${NEW_HEADER_DIR}/BDKFFI"
+mkdir -p "${NEW_HEADER_DIR}/BDKFFI"
+
+# Move generated header and modulemap into BDKFFI subfolder only
+mv "${HEADERPATH}" "${NEW_HEADER_DIR}/BDKFFI/BitcoinDevKitFFI.h"
+mv "${MODMAPPATH}" "${NEW_HEADER_DIR}/BDKFFI/module.modulemap"
+
+# Ensure the modulemap points at the header using the BDKFFI/ prefix,
+# matching the desired structure inside bdkffi.xcframework.
+sed -i '' 's#header \"BitcoinDevKitFFI.h\"#header \"BDKFFI/BitcoinDevKitFFI.h\"#' "${NEW_HEADER_DIR}/BDKFFI/module.modulemap" || true
+
+echo -e "\n" >> "${NEW_HEADER_DIR}/BDKFFI/module.modulemap"
 # remove old xcframework directory
 rm -rf "${OUTDIR}/${NAME}.xcframework"
 
