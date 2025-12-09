@@ -43,24 +43,24 @@ cd ../bdk-swift/ || exit
 # move bdk-ffi static lib header files to temporary directory
 # Final xcframework structure (per-arch):
 #   Headers/
-#     BDKFFI/
+#     BitcoinDevKitFFI/
 #       BitcoinDevKitFFI.h
 #       module.modulemap
 
 # Start from a clean header include dir so we don't get duplicates
 rm -f "${NEW_HEADER_DIR}/BitcoinDevKitFFI.h" "${NEW_HEADER_DIR}/module.modulemap"
-rm -rf "${NEW_HEADER_DIR}/BDKFFI"
-mkdir -p "${NEW_HEADER_DIR}/BDKFFI"
+rm -rf "${NEW_HEADER_DIR}/BitcoinDevKitFFI"
+mkdir -p "${NEW_HEADER_DIR}/BitcoinDevKitFFI"
 
-# Move generated header and modulemap into BDKFFI subfolder only
-mv "${HEADERPATH}" "${NEW_HEADER_DIR}/BDKFFI/BitcoinDevKitFFI.h"
-mv "${MODMAPPATH}" "${NEW_HEADER_DIR}/BDKFFI/module.modulemap"
+# Move generated header and modulemap into BitcoinDevKitFFI subfolder only
+mv "${HEADERPATH}" "${NEW_HEADER_DIR}/BitcoinDevKitFFI/BitcoinDevKitFFI.h"
+mv "${MODMAPPATH}" "${NEW_HEADER_DIR}/BitcoinDevKitFFI/module.modulemap"
 
-# Ensure the modulemap points at the header using the BDKFFI/ prefix,
+# Ensure the modulemap points at the header using the BitcoinDevKitFFI/ prefix,
 # matching the desired structure inside bdkffi.xcframework.
-sed -i '' 's#header \"BDKFFI/BitcoinDevKitFFI.h\"#header \"BitcoinDevKitFFI.h\"#' "${NEW_HEADER_DIR}/BDKFFI/module.modulemap" || true
+sed -i '' 's#header \"BitcoinDevKitFFI/BitcoinDevKitFFI.h\"#header \"BitcoinDevKitFFI.h\"#' "${NEW_HEADER_DIR}/BitcoinDevKitFFI/module.modulemap" || true
 
-echo -e "\n" >> "${NEW_HEADER_DIR}/BDKFFI/module.modulemap"
+echo -e "\n" >> "${NEW_HEADER_DIR}/BitcoinDevKitFFI/module.modulemap"
 # remove old xcframework directory
 rm -rf "${OUTDIR}/${NAME}.xcframework"
 
@@ -73,11 +73,3 @@ xcodebuild -create-xcframework \
     -library "${TARGETDIR}/lipo-ios-sim/${RELDIR}/${STATIC_LIB_NAME}" \
     -headers "${NEW_HEADER_DIR}" \
     -output "${OUTDIR}/${NAME}.xcframework"
-
-# By default the generated Info.plist sets HeadersPath to "Headers", but our
-# headers (and module.modulemap) live under Headers/BDKFFI. Update the plist to
-# reflect that so SwiftPM/Xcode can discover the module map without moving files.
-PLIST="${OUTDIR}/${NAME}.xcframework/Info.plist"
-/usr/libexec/PlistBuddy -c "Set :AvailableLibraries:0:HeadersPath Headers/BDKFFI" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :AvailableLibraries:1:HeadersPath Headers/BDKFFI" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :AvailableLibraries:2:HeadersPath Headers/BDKFFI" "$PLIST"
