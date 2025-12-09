@@ -58,7 +58,7 @@ mv "${MODMAPPATH}" "${NEW_HEADER_DIR}/BDKFFI/module.modulemap"
 
 # Ensure the modulemap points at the header using the BDKFFI/ prefix,
 # matching the desired structure inside bdkffi.xcframework.
-sed -i '' 's#header \"BitcoinDevKitFFI.h\"#header \"BDKFFI/BitcoinDevKitFFI.h\"#' "${NEW_HEADER_DIR}/BDKFFI/module.modulemap" || true
+sed -i '' 's#header \"BDKFFI/BitcoinDevKitFFI.h\"#header \"BitcoinDevKitFFI.h\"#' "${NEW_HEADER_DIR}/BDKFFI/module.modulemap" || true
 
 echo -e "\n" >> "${NEW_HEADER_DIR}/BDKFFI/module.modulemap"
 # remove old xcframework directory
