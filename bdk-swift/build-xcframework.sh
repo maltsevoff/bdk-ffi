@@ -73,3 +73,11 @@ xcodebuild -create-xcframework \
     -library "${TARGETDIR}/lipo-ios-sim/${RELDIR}/${STATIC_LIB_NAME}" \
     -headers "${NEW_HEADER_DIR}" \
     -output "${OUTDIR}/${NAME}.xcframework"
+
+# By default the generated Info.plist sets HeadersPath to "Headers", but our
+# headers (and module.modulemap) live under Headers/BDKFFI. Update the plist to
+# reflect that so SwiftPM/Xcode can discover the module map without moving files.
+PLIST="${OUTDIR}/${NAME}.xcframework/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :AvailableLibraries:0:HeadersPath Headers/BDKFFI" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :AvailableLibraries:1:HeadersPath Headers/BDKFFI" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :AvailableLibraries:2:HeadersPath Headers/BDKFFI" "$PLIST"
