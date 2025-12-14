@@ -14,7 +14,7 @@ NEW_HEADER_DIR="../bdk-ffi/target/include/BitcoinDevKitFFI"
 
 cd ../bdk-ffi/ || exit
 
-# install component and targets bbb
+# install component and targets try S
 rustup component add rust-src
 rustup target add aarch64-apple-ios      # iOS arm64
 rustup target add x86_64-apple-ios       # iOS x86_64
